@@ -53,7 +53,30 @@ export class ProjectsService {
     });
   }
 
-  async findAll() {
-    return await this.projectRepo.find({ relations: { userProjects: { user: true } } });
+  async findAll(userId: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role !== 3) {
+      throw new Error('Unauthorized');
+    }
+    return await this.projectRepo.find({
+      relations: ['userProjects', 'userProjects.user'],
+      select: {
+        id: true,
+        name: true,
+        startDate: true,
+        endDate: true,
+        status: true,
+        userProjects: {
+          role: true,
+          user: {
+            name: true,
+            bankInfo: true
+          }
+        }
+      }
+    });
   }
 }

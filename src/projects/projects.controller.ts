@@ -14,4 +14,11 @@ export class ProjectsController {
     const userId = req.user.id;
     return this.projectsService.findByUser(userId);
   }
+
+  @Get('list')
+  @UseGuards(JwtAuthGuard)
+  findAll(@Req() req) {
+    const userId = req.user.id;
+    return this.projectsService.findAll(userId);
+  }
 }

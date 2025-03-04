@@ -9,6 +9,12 @@ export class Project {
     @Column()
     name: string;
 
+    @Column({ type: 'date', nullable: true })
+    startDate: Date;
+
+    @Column({ type: 'date', nullable: true })
+    endDate: Date;
+
     @Column({ default: 0 })
     status: number; // 0 - inactive, 1 - active, 2 - suspended, 3 - deleted
 
