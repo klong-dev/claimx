@@ -26,8 +26,14 @@ export class ProjectsService {
     if (!user) {
       throw new Error('User not found');
     }
-    const userProjects = await this.userProjectRepo.find({ where: { user: { id: userId } } });
-    const projectIds = userProjects.map(up => up.id);
+    const userProjects = await this.userProjectRepo.find({
+      where: { user: { id: userId } },
+      relations: {
+        project: true
+      }
+    }
+    );
+    const projectIds = userProjects.map(up => up.project.id);
     return await this.projectRepo.find({
       where: { id: In(projectIds) },
       relations: {
