@@ -62,7 +62,7 @@ export class ClaimRequestService {
         });
       case 1:
         return await this.claimRequestRepo.find({
-          where: { claimer: { id: userId }, status: In([1, 2]) },
+          where: { status: In([1, 2]) },
           relations: ['claimer', 'project', 'approver'],
           select: {
             id: true,
@@ -88,7 +88,7 @@ export class ClaimRequestService {
         });
       case 2:
         return await this.claimRequestRepo.find({
-          where: { claimer: { id: userId }, status: In([2, 3]) },
+          where: { status: In([2, 3]) },
           relations: ['claimer', 'project', 'approver', 'finance'],
           select: {
             id: true,
@@ -121,7 +121,7 @@ export class ClaimRequestService {
         });
       case 3:
         return await this.claimRequestRepo.find({
-          where: { claimer: { id: userId }, status: Not(0) },
+          where: { status: Not(0) },
           relations: ['claimer', 'project', 'approver', 'finance'],
           select: {
             id: true,
