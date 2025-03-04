@@ -1,31 +1,42 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { UserProject } from 'src/user-project/entities/user-project.entity';
+import { ClaimRequest } from 'src/claim-request/entities/claim-request.entity';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
-    firstName: string;
+    name: string;
 
-    @Column()
-    lastName: string;
-
-    @Column()
-    phone: string;
-
-    @Column()
+    @Column({ unique: true })
     email: string;
 
     @Column()
     password: string;
 
-    @Column()
-    role: number;
+    @Column({ unique: true, nullable: true })
+    phone: string;
 
-    @Column()
-    status: number;
+    @Column({ nullable: true })
+    bankInfo: string;
+
+    @Column({ default: 0 })
+    role: number; // 0 - claimer, 1 - approver, 2 - finance, 3 - admin
+
+    @Column({ default: 1 })
+    status: number; // 0 - inactive, 1 - active, 2 - suspended, 3 - deleted
+
+    @OneToMany(() => UserProject, (userProject) => userProject.user)
+    projects: UserProject[];
+
+    @OneToMany(() => ClaimRequest, (claimRequest) => claimRequest.claimer)
+    claims: ClaimRequest[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 }
-
-// role: 0 - claimer, 1 - approver, 2 - finance, 3 - admin
-// status: 0 - inactive, 1 - active, 2 - suspended, 3 - deleted
