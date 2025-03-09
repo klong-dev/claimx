@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { ClaimRequestService } from './claim-request.service';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -19,5 +19,47 @@ export class ClaimRequestController {
   findByClaimer(@Req() req) {
     const userId = req.user.id;
     return this.claimRequestService.findByClaimer(userId);
+  }
+
+  @Put('approve/:requestId')
+  @UseGuards(JwtAuthGuard)
+  async approve(@Req() req, @Param('requestId') requestId: number) {
+    const userId = req.user.id;
+    return this.claimRequestService.approve(userId, requestId);
+  }
+
+  @Put('reject/:requestId')
+  @UseGuards(JwtAuthGuard)
+  async reject(@Req() req, @Param('requestId') requestId: number) {
+    const userId = req.user.id;
+    return this.claimRequestService.reject(userId, requestId);
+  }
+
+  @Put('return/:requestId')
+  @UseGuards(JwtAuthGuard)
+  async return(@Req() req, @Param('requestId') requestId: number) {
+    const userId = req.user.id;
+    return this.claimRequestService.return(userId, requestId);
+  }
+
+  @Put('submit/:requestId')
+  @UseGuards(JwtAuthGuard)
+  async submit(@Req() req, @Param('requestId') requestId: number) {
+    const userId = req.user.id;
+    return this.claimRequestService.submitDraft(userId, requestId);
+  }
+
+  @Put('cancel/:requestId')
+  @UseGuards(JwtAuthGuard)
+  async cancel(@Req() req, @Param('requestId') requestId: number) {
+    const userId = req.user.id;
+    return this.claimRequestService.cancel(userId, requestId);
+  }
+
+  @Put('pay/:requestId')
+  @UseGuards(JwtAuthGuard)
+  async pay(@Req() req, @Param('requestId') requestId: number) {
+    const userId = req.user.id;
+    return this.claimRequestService.pay(userId, requestId);
   }
 }

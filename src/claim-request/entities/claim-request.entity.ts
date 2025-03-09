@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDa
 import { User } from 'src/users/entities/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
 import { Claim } from 'src/claim/entities/claim.entity';
+import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 
 @Entity()
 export class ClaimRequest {
@@ -30,8 +31,13 @@ export class ClaimRequest {
     @OneToMany(() => Claim, (claim) => claim.request)
     claims: Claim[];
 
-    @Column({ default: 0 })
-    status: number; // 0 - draft, 1 - pending approve, 2 - approved, 3 - paid
+    @Column()
+    @Column({
+        type: 'enum',
+        enum: ClaimRequestStatus,
+        default: ClaimRequestStatus.PENDING
+    })
+    status: string;
 
     @CreateDateColumn()
     createdAt: Date;

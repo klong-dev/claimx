@@ -79,4 +79,40 @@ export class ProjectsService {
       }
     });
   }
+
+  async create(userId: number, createProjectDto: CreateProjectDto) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role !== 3) {
+      throw new Error('Unauthorized');
+    }
+    const project = this.projectRepo.create(createProjectDto);
+    return await this.projectRepo.save(project);
+  }
+
+  async addMember(userId: number, projectId: number, memberId: number, role: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role !== 3) {
+      throw new Error('Unauthorized');
+    }
+    const project = await this.projectRepo.findOne({ where: { id: projectId } });
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    const member = await this.userRepo.findOne({ where: { id: memberId } });
+    if (!member) {
+      throw new Error('Member not found');
+    }
+    const userProject = this.userProjectRepo.create({
+      user: member,
+      project: project,
+      role
+    });
+    return await this.userProjectRepo.save(userProject);
+  }
 }

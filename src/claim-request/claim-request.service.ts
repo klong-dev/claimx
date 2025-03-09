@@ -4,6 +4,7 @@ import { ClaimRequest } from './entities/claim-request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 @Injectable()
 export class ClaimRequestService {
   constructor(
@@ -17,7 +18,24 @@ export class ClaimRequestService {
     await this.claimRequestRepo.save({
       ...createClaimRequestDto,
       claimer: { id: userId },
-      status: 1, // active
+      status: ClaimRequestStatus.PENDING
+    });
+  }
+
+  async submitDraft(userId: number, claimRequestId: number) {
+    const claimRequest = await this.claimRequestRepo.findOne({
+      where: { id: claimRequestId },
+      relations: ['claims']
+    });
+    if (!claimRequest) {
+      throw new Error('Claim request not found');
+    }
+    if (claimRequest.status !== ClaimRequestStatus.DRAFT) {
+      throw new Error('Claim request is not draft');
+    }
+    await this.claimRequestRepo.update(claimRequestId, {
+      status: ClaimRequestStatus.PENDING,
+      claimer: { id: userId }
     });
   }
 
@@ -70,7 +88,7 @@ export class ClaimRequestService {
         });
       case 1:
         return await this.claimRequestRepo.find({
-          where: { status: In([1, 2]) },
+          where: { status: In([ClaimRequestStatus.REJECTED, ClaimRequestStatus.CANCELLED, ClaimRequestStatus.APPROVED, ClaimRequestStatus.PENDING]) },
           relations: ['claims', 'claimer', 'project', 'approver'],
           select: {
             id: true,
@@ -104,7 +122,7 @@ export class ClaimRequestService {
         });
       case 2:
         return await this.claimRequestRepo.find({
-          where: { status: In([2, 3]) },
+          where: { status: In([ClaimRequestStatus.PAID, ClaimRequestStatus.APPROVED]) },
           relations: ['claims', 'claimer', 'project', 'approver', 'finance'],
           select: {
             id: true,
@@ -145,7 +163,7 @@ export class ClaimRequestService {
         });
       case 3:
         return await this.claimRequestRepo.find({
-          where: { status: Not(0) },
+          where: { status: Not(ClaimRequestStatus.DRAFT) },
           relations: ['claims', 'claimer', 'project', 'approver', 'finance'],
           select: {
             id: true,
@@ -185,5 +203,90 @@ export class ClaimRequestService {
           }
         });
     }
+  }
+
+  async approve(userId: number, claimRequestId: number) {
+    const claimRequest = await this.claimRequestRepo.findOne({
+      where: { id: claimRequestId },
+      relations: ['claims']
+    });
+    if (!claimRequest) {
+      throw new Error('Claim request not found');
+    }
+    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
+      throw new Error('Claim request is not pending');
+    }
+    await this.claimRequestRepo.update(claimRequestId, {
+      status: ClaimRequestStatus.APPROVED,
+      approver: { id: userId }
+    });
+  }
+
+  async reject(userId: number, claimRequestId: number) {
+    const claimRequest = await this.claimRequestRepo.findOne({
+      where: { id: claimRequestId },
+      relations: ['claims']
+    });
+    if (!claimRequest) {
+      throw new Error('Claim request not found');
+    }
+    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
+      throw new Error('Claim request is not pending');
+    }
+    await this.claimRequestRepo.update(claimRequestId, {
+      status: ClaimRequestStatus.REJECTED,
+      approver: { id: userId }
+    });
+  }
+
+  async cancel(userId: number, claimRequestId: number) {
+    const claimRequest = await this.claimRequestRepo.findOne({
+      where: { id: claimRequestId },
+      relations: ['claims']
+    });
+    if (!claimRequest) {
+      throw new Error('Claim request not found');
+    }
+    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
+      throw new Error('Claim request is not pending');
+    }
+    await this.claimRequestRepo.update(claimRequestId, {
+      status: ClaimRequestStatus.CANCELLED,
+      claimer: { id: userId }
+    });
+  }
+
+  async return(userId: number, claimRequestId: number) {
+    const claimRequest = await this.claimRequestRepo.findOne({
+      where: { id: claimRequestId },
+      relations: ['claims']
+    });
+    if (!claimRequest) {
+      throw new Error('Claim request not found');
+    }
+    if (claimRequest.status !== ClaimRequestStatus.APPROVED) {
+      throw new Error('Claim request is not approved');
+    }
+    await this.claimRequestRepo.update(claimRequestId, {
+      status: ClaimRequestStatus.RETURNED,
+      finance: { id: userId }
+    });
+  }
+
+  async pay(userId: number, claimRequestId: number) {
+    const claimRequest = await this.claimRequestRepo.findOne({
+      where: { id: claimRequestId },
+      relations: ['claims']
+    });
+    if (!claimRequest) {
+      throw new Error('Claim request not found');
+    }
+    if (claimRequest.status !== ClaimRequestStatus.APPROVED) {
+      throw new Error('Claim request is not approved');
+    }
+    await this.claimRequestRepo.update(claimRequestId, {
+      status: ClaimRequestStatus.PAID,
+      finance: { id: userId }
+    });
   }
 }

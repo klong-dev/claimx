@@ -18,6 +18,6 @@ export class UserProject {
     @Column()
     role: string; // VD: Developer, Tester, Manager
 
-    @Column({ default: 0 })
+    @Column({ default: 1 })
     status: number; // 0 - inactive, 1 - active, 2 - suspended, 3 - deleted
 }
