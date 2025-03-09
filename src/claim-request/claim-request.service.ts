@@ -48,13 +48,27 @@ export class ClaimRequestService {
       case 0:
         return await this.claimRequestRepo.find({
           where: { claimer: { id: userId } },
-          relations: ['claims', 'claimer', 'project', 'approver', 'finance'],
+          relations: ['claims', 'claimer', 'project', 'approver', 'finance', 'userProjects'],
           select: {
             id: true,
             hours: true,
             status: true,
             createdAt: true,
             updatedAt: true,
+            project: {
+              id: true,
+              name: true,
+              startDate: true,
+              endDate: true,
+              status: true,
+              userProjects: {
+                role: true,
+                user: {
+                  name: true,
+                  bankInfo: true
+                }
+              }
+            },
             claims: {
               id: true,
               date: true,
