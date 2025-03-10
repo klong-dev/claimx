@@ -1,4 +1,6 @@
-import { IsInt } from 'class-validator';
+import { IsArray, IsInt, IsObject } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateClaimDto } from 'src/claim/dto/create-claim.dto';
 
 export class CreateClaimRequestDto {
     @IsInt()
@@ -6,4 +8,8 @@ export class CreateClaimRequestDto {
 
     @IsInt()
     hours: number;
+
+    @IsArray()
+    @Type(() => CreateClaimDto)
+    claims: CreateClaimDto[];
 }

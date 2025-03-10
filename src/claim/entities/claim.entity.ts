@@ -25,7 +25,7 @@ export class Claim {
     @JoinColumn({ name: 'requestId' })
     request: ClaimRequest;
 
-    @Column()
+    @Column({ default: 1 })
     status: number; // 0 - inactive, 1 - active, 2 - suspended, 3 - deleted
 
     @CreateDateColumn()

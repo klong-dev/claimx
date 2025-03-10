@@ -6,10 +6,11 @@ import { User } from 'src/users/entities/user.entity';
 import { ClaimRequest } from './entities/claim-request.entity';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Claim } from 'src/claim/entities/claim.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ClaimRequest, User]),
+    TypeOrmModule.forFeature([ClaimRequest, User, Claim]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

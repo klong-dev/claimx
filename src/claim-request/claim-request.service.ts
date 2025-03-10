@@ -5,9 +5,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
+import { Claim } from 'src/claim/entities/claim.entity';
 @Injectable()
 export class ClaimRequestService {
   constructor(
+    @InjectRepository(Claim)
+    private claimRepo: Repository<Claim>,
+
     @InjectRepository(ClaimRequest)
     private claimRequestRepo: Repository<ClaimRequest>,
 
@@ -15,11 +19,28 @@ export class ClaimRequestService {
     private userRepo: Repository<User>) { }
 
   async create(userId: number, createClaimRequestDto: CreateClaimRequestDto) {
-    await this.claimRequestRepo.save({
-      ...createClaimRequestDto,
-      claimer: { id: userId },
-      status: ClaimRequestStatus.PENDING
+    const { claims, projectId, hours } = createClaimRequestDto;
+
+    // Chuyển đổi claims từ DTO sang entity Claim[]
+    const claimEntities = claims.map((claimDto) => this.claimRepo.create({
+      ...claimDto,
+      hours: Number(claimDto.hours),
+    }));
+
+    // Tạo claimRequest entity
+    const claimRequest = this.claimRequestRepo.create({
+      claimer: { id: userId }, // Gán claimer bằng object { id: userId }
+      project: { id: projectId }, // Gán projectId vào object Project
+      hours,
+      claims: claimEntities, // Gán danh sách Claim entities
+      status: ClaimRequestStatus.PENDING,
     });
+
+    // Lưu các claims trước khi lưu claimRequest
+    await this.claimRepo.save(claimEntities);
+
+    // Lưu claimRequest vào database
+    return await this.claimRequestRepo.save(claimRequest);
   }
 
   async submitDraft(userId: number, claimRequestId: number) {
@@ -48,7 +69,7 @@ export class ClaimRequestService {
       case 0:
         return await this.claimRequestRepo.find({
           where: { claimer: { id: userId } },
-          relations: ['claims', 'claimer', 'project', 'approver', 'finance'],
+          relations: ['claims', 'claimer', 'project', 'approver', 'finance', 'project.userProjects', 'project.userProjects.project'],
           select: {
             id: true,
             hours: true,
@@ -57,7 +78,9 @@ export class ClaimRequestService {
             updatedAt: true,
             project: {
               name: true,
+              id: true,
               userProjects: {
+                role: true,
                 user: {
                   name: true,
                   bankInfo: true
