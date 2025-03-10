@@ -67,9 +67,9 @@ export class ClaimRequestService {
     }
     switch (user.role) {
       case 0:
-        return await this.claimRequestRepo.find({
+        const claimRequests = await this.claimRequestRepo.find({
           where: { claimer: { id: userId } },
-          relations: ['claims', 'claimer', 'project', 'approver', 'finance', 'project.userProjects', 'project.userProjects.project'],
+          relations: ['claims', 'claimer', 'project', 'approver', 'finance', 'project.userProjects', 'project.userProjects.user'],
           select: {
             id: true,
             hours: true,
@@ -78,12 +78,13 @@ export class ClaimRequestService {
             updatedAt: true,
             project: {
               name: true,
-              id: true,
               userProjects: {
                 role: true,
                 user: {
+                  id: true,
                   name: true,
-                  bankInfo: true
+                  email: true,
+                  bankInfo: true,
                 }
               }
             },
@@ -118,6 +119,14 @@ export class ClaimRequestService {
             },
           }
         });
+        claimRequests.forEach((request) => {
+          if (request.project) {
+            request.project.userProjects = request.project.userProjects.filter(
+              (up) => up.user.id === userId
+            );
+          }
+        });
+        return claimRequests;
       case 1:
         return await this.claimRequestRepo.find({
           where: { status: In([ClaimRequestStatus.REJECTED, ClaimRequestStatus.CANCELLED, ClaimRequestStatus.APPROVED, ClaimRequestStatus.PENDING]) },
@@ -153,9 +162,9 @@ export class ClaimRequestService {
           }
         });
       case 2:
-        return await this.claimRequestRepo.find({
+        const claimRequest = await this.claimRequestRepo.find({
           where: { status: In([ClaimRequestStatus.PAID, ClaimRequestStatus.APPROVED]) },
-          relations: ['claims', 'claimer', 'project', 'approver', 'finance'],
+          relations: ['claims', 'claimer', 'project', 'approver', 'finance', 'project.userProjects', 'project.userProjects.user'],
           select: {
             id: true,
             hours: true,
@@ -190,9 +199,27 @@ export class ClaimRequestService {
               email: true,
               phone: true,
               bankInfo: true,
+            },
+            project: {
+              name: true,
+              userProjects: {
+                role: true,
+                user: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  bankInfo: true,
+                }
+              }
             }
           }
         });
+        claimRequest.forEach((request) => {
+          request.project.userProjects = request.project.userProjects.filter(
+            (up) => up.user.id === userId
+          );
+        });
+        return claimRequest;
       case 3:
         return await this.claimRequestRepo.find({
           where: { status: Not(ClaimRequestStatus.DRAFT) },
