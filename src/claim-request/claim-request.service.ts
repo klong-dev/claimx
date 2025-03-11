@@ -7,6 +7,7 @@ import { User } from '../users/entities/user.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 import { Claim } from 'src/claim/entities/claim.entity';
 import { UpdateClaimRequestDto } from './dto/update-claim-request.dto';
+import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class ClaimRequestService {
   constructor(
@@ -76,7 +77,7 @@ export class ClaimRequestService {
 
     if (!existingClaimRequest) {
       // Tạo claimRequest entity
-      const claimRequest = this.claimRequestRepo.create({
+      let claimRequest = this.claimRequestRepo.create({
         claimer: { id: userId }, // Gán claimer bằng object { id: userId }
         project: { id: projectId }, // Gán projectId vào object Project
         hours,
@@ -92,11 +93,15 @@ export class ClaimRequestService {
 
       await this.claimRepo.save(claimEntities);
 
+      claimRequest = await this.claimRequestRepo.findOne({
+        where: { id: claimRequest.id },
+        relations: ['claims'],
+      })
       return claimRequest; // data return
     }
 
     if ((existingClaimRequest.status !== ClaimRequestStatus.DRAFT) && (existingClaimRequest.status !== ClaimRequestStatus.RETURNED)) {
-      throw new Error('ClaimRequest can not save');
+      throw new HttpException('ClaimRequest can not be saved', HttpStatus.BAD_REQUEST);
     }
     const updatedClaimRequest = this.claimRequestRepo.create({
       project: { id: projectId },
@@ -115,13 +120,17 @@ export class ClaimRequestService {
 
     await this.claimRepo.save(claimEntities);
 
-    return existingClaimRequest;
+    const updatedRequest = await this.claimRequestRepo.findOne({
+      where: { id: requestId },
+      relations: ['claims'],
+    });
+    return updatedRequest;
   }
 
   async findByClaimer(userId: number) {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
     switch (user.role) {
       case 0:
@@ -332,10 +341,10 @@ export class ClaimRequestService {
       relations: ['claims']
     });
     if (!claimRequest) {
-      throw new Error('Claim request not found');
+      throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
     if (claimRequest.status !== ClaimRequestStatus.PENDING) {
-      throw new Error('Claim request is not pending');
+      throw new HttpException('Claim request is not pending', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
       status: ClaimRequestStatus.APPROVED,
@@ -349,10 +358,10 @@ export class ClaimRequestService {
       relations: ['claims']
     });
     if (!claimRequest) {
-      throw new Error('Claim request not found');
+      throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
     if (claimRequest.status !== ClaimRequestStatus.PENDING) {
-      throw new Error('Claim request is not pending');
+      throw new HttpException('Claim request is not pending', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
       status: ClaimRequestStatus.REJECTED,
@@ -366,10 +375,10 @@ export class ClaimRequestService {
       relations: ['claims']
     });
     if (!claimRequest) {
-      throw new Error('Claim request not found');
+      throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
     if (claimRequest.status !== ClaimRequestStatus.PENDING) {
-      throw new Error('Claim request is not pending');
+      throw new HttpException('Claim request is not pending', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
       status: ClaimRequestStatus.CANCELLED,
@@ -383,10 +392,10 @@ export class ClaimRequestService {
       relations: ['claims']
     });
     if (!claimRequest) {
-      throw new Error('Claim request not found');
+      throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
-    if (claimRequest.status !== ClaimRequestStatus.APPROVED) {
-      throw new Error('Claim request is not approved');
+    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
+      throw new HttpException('Claim request is not approved', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
       status: ClaimRequestStatus.RETURNED,
@@ -400,10 +409,10 @@ export class ClaimRequestService {
       relations: ['claims']
     });
     if (!claimRequest) {
-      throw new Error('Claim request not found');
+      throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
-    if (claimRequest.status !== ClaimRequestStatus.APPROVED) {
-      throw new Error('Claim request is not approved');
+    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
+      throw new HttpException('Claim request is not approved', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
       status: ClaimRequestStatus.PAID,
