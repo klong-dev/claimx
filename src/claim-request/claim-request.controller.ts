@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req } from 
 import { ClaimRequestService } from './claim-request.service';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { UpdateClaimRequestDto } from './dto/update-claim-request.dto';
 
 @Controller('claim-request')
 export class ClaimRequestController {
@@ -19,6 +20,13 @@ export class ClaimRequestController {
   findByClaimer(@Req() req) {
     const userId = req.user.id;
     return this.claimRequestService.findByClaimer(userId);
+  }
+
+  @Post('/save')
+  @UseGuards(JwtAuthGuard)
+  async save(@Req() req, @Body() dto: UpdateClaimRequestDto) {
+    const userId = req.user.id;
+    return this.claimRequestService.save(userId, dto);
   }
 
   @Put('approve/:requestId')
