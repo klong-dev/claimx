@@ -6,6 +6,7 @@ import { In, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 import { Claim } from 'src/claim/entities/claim.entity';
+import { UpdateClaimRequestDto } from './dto/update-claim-request.dto';
 @Injectable()
 export class ClaimRequestService {
   constructor(
@@ -63,6 +64,58 @@ export class ClaimRequestService {
       status: ClaimRequestStatus.PENDING,
       claimer: { id: userId }
     });
+  }
+
+  async save(userId: number, updateClaimRequestDto: UpdateClaimRequestDto) {
+    const { requestId, claims, projectId, hours } = updateClaimRequestDto;
+
+    const existingClaimRequest = await this.claimRequestRepo.findOne({
+      where: { id: requestId },
+      relations: ['claims'],
+    });
+
+    if (!existingClaimRequest) {
+      // Tạo claimRequest entity
+      const claimRequest = this.claimRequestRepo.create({
+        claimer: { id: userId }, // Gán claimer bằng object { id: userId }
+        project: { id: projectId }, // Gán projectId vào object Project
+        hours,
+        status: ClaimRequestStatus.DRAFT,
+      });
+      await this.claimRequestRepo.save(claimRequest);
+
+      const claimEntities = claims.map((claimDto) => this.claimRepo.create({
+        ...claimDto,
+        hours: Number(claimDto.hours),
+        request: claimRequest
+      }));
+
+      await this.claimRepo.save(claimEntities);
+
+      return claimRequest; // data return
+    }
+
+    if ((existingClaimRequest.status !== ClaimRequestStatus.DRAFT) && (existingClaimRequest.status !== ClaimRequestStatus.RETURNED)) {
+      throw new Error('ClaimRequest can not save');
+    }
+    const updatedClaimRequest = this.claimRequestRepo.create({
+      project: { id: projectId },
+      hours,
+      status: existingClaimRequest.status
+    });
+    await this.claimRequestRepo.update(requestId, updatedClaimRequest);
+
+    await this.claimRepo.delete({ request: { id: requestId } });
+
+    const claimEntities = claims.map((claimDto) => this.claimRepo.create({
+      ...claimDto,
+      hours: Number(claimDto.hours),
+      request: existingClaimRequest
+    }));
+
+    await this.claimRepo.save(claimEntities);
+
+    return existingClaimRequest;
   }
 
   async findByClaimer(userId: number) {
