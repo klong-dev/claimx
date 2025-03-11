@@ -377,8 +377,8 @@ export class ClaimRequestService {
     if (!claimRequest) {
       throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
-    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
-      throw new HttpException('Claim request is not pending', HttpStatus.BAD_REQUEST);
+    if (claimRequest.status !== ClaimRequestStatus.PENDING && claimRequest.status !== ClaimRequestStatus.CANCELLED) {
+      throw new HttpException('Claim request cannot attach this action', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
       status: ClaimRequestStatus.CANCELLED,

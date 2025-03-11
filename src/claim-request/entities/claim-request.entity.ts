@@ -17,7 +17,7 @@ export class ClaimRequest {
     @JoinColumn({ name: 'projectId' })
     project: Project;
 
-    @Column()
+    @Column({ type: 'float', default: 1.0 })
     hours: number;
 
     @ManyToOne(() => User)

@@ -15,7 +15,7 @@ export class Claim {
     @Column({ type: 'time' })
     to: string; // HH:mm:ss
 
-    @Column()
+    @Column({ type: "float", default: 1.0 })
     hours: number;
 
     @Column({ type: 'text', nullable: true })
