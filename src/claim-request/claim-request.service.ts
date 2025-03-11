@@ -99,6 +99,7 @@ export class ClaimRequestService {
               from: true,
               to: true,
               hours: true,
+              remark: true,
               status: true,
             },
             claimer: {
@@ -148,6 +149,7 @@ export class ClaimRequestService {
               from: true,
               to: true,
               hours: true,
+              remark: true,
               status: true,
             },
             claimer: {
@@ -182,6 +184,7 @@ export class ClaimRequestService {
               from: true,
               to: true,
               hours: true,
+              remark: true,
               status: true,
             },
             claimer: {
@@ -241,6 +244,7 @@ export class ClaimRequestService {
               from: true,
               to: true,
               hours: true,
+              remark: true,
               status: true,
             },
             claimer: {
