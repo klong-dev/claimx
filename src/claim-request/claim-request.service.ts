@@ -75,7 +75,7 @@ export class ClaimRequestService {
       relations: ['claims'],
     });
 
-    if (!existingClaimRequest) {
+    if (!existingClaimRequest || !requestId) {
       // Tạo claimRequest entity
       let claimRequest = this.claimRequestRepo.create({
         claimer: { id: userId }, // Gán claimer bằng object { id: userId }
