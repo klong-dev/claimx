@@ -22,25 +22,30 @@ export class ClaimRequestService {
     const { claims, projectId, hours } = createClaimRequestDto;
 
     // Chuyển đổi claims từ DTO sang entity Claim[]
-    const claimEntities = claims.map((claimDto) => this.claimRepo.create({
-      ...claimDto,
-      hours: Number(claimDto.hours),
-    }));
+
 
     // Tạo claimRequest entity
     const claimRequest = this.claimRequestRepo.create({
       claimer: { id: userId }, // Gán claimer bằng object { id: userId }
       project: { id: projectId }, // Gán projectId vào object Project
       hours,
-      claims: claimEntities, // Gán danh sách Claim entities
       status: ClaimRequestStatus.PENDING,
     });
+
+    await this.claimRequestRepo.save(claimRequest);
+
+    const claimEntities = claims.map((claimDto) => this.claimRepo.create({
+      ...claimDto,
+      hours: Number(claimDto.hours),
+      request: claimRequest
+    }));
 
     // Lưu các claims trước khi lưu claimRequest
     await this.claimRepo.save(claimEntities);
 
+    return claimRequest;
+
     // Lưu claimRequest vào database
-    return await this.claimRequestRepo.save(claimRequest);
   }
 
   async submitDraft(userId: number, claimRequestId: number) {
