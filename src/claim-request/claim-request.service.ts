@@ -30,6 +30,7 @@ export class ClaimRequestService {
     const claimRequest = this.claimRequestRepo.create({
       claimer: { id: userId }, // Gán claimer bằng object { id: userId }
       project: { id: projectId }, // Gán projectId vào object Project
+      additionalRemark: createClaimRequestDto.additionalRemark,
       hours,
       status: ClaimRequestStatus.PENDING,
     });
@@ -141,11 +142,14 @@ export class ClaimRequestService {
             id: true,
             hours: true,
             status: true,
+            additionalRemark: true,
             createdAt: true,
             updatedAt: true,
             project: {
               id: true,
               name: true,
+              startDate: true,
+              endDate: true,
               userProjects: {
                 role: true,
                 user: {
@@ -204,6 +208,7 @@ export class ClaimRequestService {
             id: true,
             hours: true,
             status: true,
+            additionalRemark: true,
             createdAt: true,
             updatedAt: true,
             claims: {
@@ -239,6 +244,7 @@ export class ClaimRequestService {
             id: true,
             hours: true,
             status: true,
+            additionalRemark: true,
             createdAt: true,
             updatedAt: true,
             claims: {
@@ -299,6 +305,7 @@ export class ClaimRequestService {
             id: true,
             hours: true,
             status: true,
+            additionalRemark: true,
             createdAt: true,
             updatedAt: true,
             claims: {

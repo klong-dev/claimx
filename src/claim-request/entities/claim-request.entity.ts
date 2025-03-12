@@ -20,6 +20,9 @@ export class ClaimRequest {
     @Column({ type: 'float', default: 1.0 })
     hours: number;
 
+    @Column({ nullable: true })
+    additionalRemark: string;
+
     @ManyToOne(() => User)
     @JoinColumn({ name: 'approverId' })
     approver: User;
