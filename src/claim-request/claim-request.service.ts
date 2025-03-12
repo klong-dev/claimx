@@ -412,7 +412,7 @@ export class ClaimRequestService {
     if (!claimRequest) {
       throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
-    if (claimRequest.status !== ClaimRequestStatus.PENDING) {
+    if (claimRequest.status !== ClaimRequestStatus.APPROVED) {
       throw new HttpException('Claim request is not approved', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {

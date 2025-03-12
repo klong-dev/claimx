@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -115,7 +115,7 @@ export class ProjectsService {
       throw new Error('User not found');
     }
     if (user.role !== 3) {
-      throw new Error('Unauthorized');
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     const project = this.projectRepo.create(createProjectDto);
     return await this.projectRepo.save(project);
