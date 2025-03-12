@@ -144,6 +144,7 @@ export class ClaimRequestService {
             createdAt: true,
             updatedAt: true,
             project: {
+              id: true,
               name: true,
               userProjects: {
                 role: true,
@@ -377,7 +378,7 @@ export class ClaimRequestService {
     if (!claimRequest) {
       throw new HttpException('Claim request not found', HttpStatus.BAD_REQUEST);
     }
-    if (claimRequest.status !== ClaimRequestStatus.PENDING && claimRequest.status !== ClaimRequestStatus.CANCELLED && claimRequest.status !== ClaimRequestStatus.DRAFT) {
+    if (claimRequest.status !== ClaimRequestStatus.PENDING && claimRequest.status !== ClaimRequestStatus.RETURNED && claimRequest.status !== ClaimRequestStatus.DRAFT) {
       throw new HttpException('Claim request cannot attach this action', HttpStatus.BAD_REQUEST);
     }
     await this.claimRequestRepo.update(claimRequestId, {
