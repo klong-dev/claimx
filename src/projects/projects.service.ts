@@ -6,7 +6,7 @@ import { In, Not, Repository } from 'typeorm';
 import { Project } from './entities/project.entity';
 import { UserProject } from 'src/user-project/entities/user-project.entity';
 import { User } from 'src/users/entities/user.entity';
-
+import { UserProjectDto } from './dto/user-project.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -80,6 +80,35 @@ export class ProjectsService {
     });
   }
 
+  async listMem(userId: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role !== 3) {
+      throw new Error('Unauthorized');
+    }
+    return await this.userProjectRepo.find({
+      relations: ['user', 'project'],
+      select: {
+        role: true,
+        status: true,
+        user: {
+          id: true,
+          name: true,
+          bankInfo: true,
+          phone: true,
+          email: true,
+          role: true
+        },
+        project: {
+          id: true,
+          name: true
+        }
+      }
+    });
+  }
+
   async create(userId: number, createProjectDto: CreateProjectDto) {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
@@ -92,7 +121,8 @@ export class ProjectsService {
     return await this.projectRepo.save(project);
   }
 
-  async addMember(userId: number, projectId: number, memberId: number, role: string) {
+  async addMember(userId: number, userProjectDto: UserProjectDto) {
+    const { projectId, memberId, role } = userProjectDto;
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
       throw new Error('User not found');

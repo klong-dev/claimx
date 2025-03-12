@@ -1,15 +1,15 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class UserProjectDto {
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
-    name: string;
+    projectId: number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    memberId: number;
 
     @IsString()
     @IsNotEmpty()
-    startDate: Date;
-
-    @IsString()
-    @IsNotEmpty()
-    endDate: Date;
+    role: string;
 }
