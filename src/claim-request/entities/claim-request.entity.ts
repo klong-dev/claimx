@@ -3,6 +3,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
 import { Claim } from 'src/claim/entities/claim.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
+import { Comment } from 'src/comments/entities/comment.entity';
 
 @Entity()
 export class ClaimRequest {
@@ -33,6 +34,9 @@ export class ClaimRequest {
 
     @OneToMany(() => Claim, (claim) => claim.request)
     claims: Claim[];
+
+    @OneToMany(() => Comment, (comment) => comment.claimRequest)
+    comments: Comment[];
 
     @Column()
     @Column({

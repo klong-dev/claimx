@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { UserProject } from 'src/user-project/entities/user-project.entity';
 import { ClaimRequest } from 'src/claim-request/entities/claim-request.entity';
+import { Comment } from 'src/comments/entities/comment.entity';
+
 
 @Entity()
 export class User {
@@ -33,6 +35,9 @@ export class User {
 
     @OneToMany(() => ClaimRequest, (claimRequest) => claimRequest.claimer)
     claims: ClaimRequest[];
+
+    @OneToMany(() => Comment, (comment) => comment.author)
+    comments: Comment[];
 
     @CreateDateColumn()
     createdAt: Date;
