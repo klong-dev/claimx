@@ -1,5 +1,4 @@
-import { IsEAN, isEmpty, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { IsNull } from "typeorm";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateCommentDto {
     @IsString()
@@ -14,6 +13,7 @@ export class CreateCommentDto {
     @IsNotEmpty()
     authorId: number;
 
-    @IsEmpty()
-    replierId: number;
+    @IsNumber()
+    @IsOptional()
+    replierId?: number;
 }
