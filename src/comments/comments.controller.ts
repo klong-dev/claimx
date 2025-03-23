@@ -1,15 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe } from '@nestjs/common';
+import { Req, Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) { }
 
   @Post()
-  create(@Body(new ValidationPipe()) createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Req() req, @Body(new ValidationPipe()) createCommentDto: CreateCommentDto) {
+    const userId = req.user.id;
+    return this.commentsService.create(userId, createCommentDto);
   }
 
   @Get()
@@ -18,8 +22,10 @@ export class CommentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  findOne(@Req() req, @Param('id') id: string) {
+    const userId = req.user.id;
+    return this.commentsService.findOne(userId, +id);
   }
 
   @Patch(':id')

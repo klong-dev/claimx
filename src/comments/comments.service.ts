@@ -16,14 +16,14 @@ export class CommentsService {
     private readonly userRepository: Repository<User>,
   ) { }
 
-  async create(createCommentDto: CreateCommentDto) {
-    const { content, claimRequestId, authorId, replierId } = createCommentDto;
-    if (!content || !claimRequestId || !authorId)
+  async create(userId: number, createCommentDto: CreateCommentDto) {
+    const { content, claimRequestId, replierId } = createCommentDto;
+    if (!content || !claimRequestId)
       throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
     const comment = this.commentRepository.create({
       content,
       claimRequest: { id: claimRequestId },
-      author: { id: authorId },
+      author: { id: userId },
       replier: { id: replierId }
     })
     await this.commentRepository.save(comment);
@@ -34,7 +34,7 @@ export class CommentsService {
     return `This action returns all comments`;
   }
 
-  findOne(requestId: number) {
+  findOne(userId: number, requestId: number) {
     const comments = this.commentRepository.find({
       where: { claimRequest: { id: requestId } },
       relations: ['author', 'replier'],

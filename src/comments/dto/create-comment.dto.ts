@@ -10,10 +10,6 @@ export class CreateCommentDto {
     claimRequestId: number;
 
     @IsNumber()
-    @IsNotEmpty()
-    authorId: number;
-
-    @IsNumber()
     @IsOptional()
     replierId?: number;
 }
