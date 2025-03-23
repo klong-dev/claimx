@@ -27,7 +27,31 @@ export class CommentsService {
       replier: { id: replierId }
     })
     await this.commentRepository.save(comment);
-    return comment;
+
+    return await this.commentRepository.findOne({
+      where: { id: comment.id },
+      relations: ['author', 'replier'],
+      select: {
+        id: true,
+        content: true,
+        author: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+        },
+        replier: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+        },
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
   }
 
   findAll() {
