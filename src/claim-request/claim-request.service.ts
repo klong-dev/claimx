@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { ClaimRequest } from './entities/claim-request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Like, Not, Repository } from 'typeorm';
+import { ILike, In, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 import { Claim } from 'src/claim/entities/claim.entity';
@@ -22,7 +22,7 @@ export class ClaimRequestService {
 
   async search(userId: number, search: string) {
     const requests = await this.claimRequestRepo.find({
-      where: { claimer: { name: Like(`%${search}%`) } },
+      where: { claimer: { name: ILike(`%${search}%`) } },
       relations: ['claims', 'project', 'approver', 'finance', 'claimer'],
       select: {
         id: true,
