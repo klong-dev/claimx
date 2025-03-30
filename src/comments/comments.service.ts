@@ -17,23 +17,37 @@ export class CommentsService {
   ) { }
 
   async create(userId: number, createCommentDto: CreateCommentDto) {
-    const { content, claimRequestId, replierId } = createCommentDto;
+    const { content, claimRequestId, repCommentId } = createCommentDto;
     if (!content || !claimRequestId)
       throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
+
+    let user: User;
+    if (repCommentId) {
+      user = (await this.commentRepository.findOne({
+        where: { id: repCommentId },
+        relations: ['author'],
+      })).author;
+      if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
     const comment = this.commentRepository.create({
       content,
       claimRequest: { id: claimRequestId },
       author: { id: userId },
-      replier: { id: replierId }
+      repComment: { id: repCommentId },
+      replier: user
     })
     await this.commentRepository.save(comment);
 
     return await this.commentRepository.findOne({
       where: { id: comment.id },
-      relations: ['author', 'replier'],
+      relations: ['author', 'replier', 'repComment'],
       select: {
         id: true,
         content: true,
+        repComment: {
+          id: true,
+          content: true,
+        },
         author: {
           id: true,
           name: true,

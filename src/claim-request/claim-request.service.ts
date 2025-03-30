@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { ClaimRequest } from './entities/claim-request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Not, Repository } from 'typeorm';
+import { In, Like, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 import { Claim } from 'src/claim/entities/claim.entity';
@@ -19,6 +19,58 @@ export class ClaimRequestService {
 
     @InjectRepository(User)
     private userRepo: Repository<User>) { }
+
+  async search(userId: number, search: string) {
+    const requests = await this.claimRequestRepo.find({
+      where: { claimer: { name: Like(`%${search}%`) } },
+      relations: ['claims', 'project', 'approver', 'finance', 'claimer'],
+      select: {
+        id: true,
+        hours: true,
+        status: true,
+        additionalRemark: true,
+        createdAt: true,
+        updatedAt: true,
+        claims: {
+          id: true,
+          date: true,
+          from: true,
+          to: true,
+          hours: true,
+          remark: true,
+          status: true,
+        },
+        project: {
+          id: true,
+          name: true,
+          startDate: true,
+          endDate: true,
+        },
+        claimer: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          bankInfo: true,
+        },
+        approver: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          bankInfo: true,
+        },
+        finance: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          bankInfo: true,
+        }
+      }
+    });
+    return requests;
+  }
 
   async create(userId: number, createClaimRequestDto: CreateClaimRequestDto) {
     const { claims, projectId, hours } = createClaimRequestDto;

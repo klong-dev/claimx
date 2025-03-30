@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import { ClaimRequestService } from './claim-request.service';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { UpdateClaimRequestDto } from './dto/update-claim-request.dto';
+import { validateHeaderName } from 'node:http';
 
 @Controller('claim-request')
 export class ClaimRequestController {
@@ -69,5 +70,12 @@ export class ClaimRequestController {
   async pay(@Req() req, @Param('requestId') requestId: number) {
     const userId = req.user.id;
     return this.claimRequestService.pay(userId, requestId);
+  }
+
+  @Get('search')
+  @UseGuards(JwtAuthGuard)
+  async search(@Req() req, @Query('v') search: string) {
+    const userId = req.user.id;
+    return this.claimRequestService.search(userId, search);
   }
 }

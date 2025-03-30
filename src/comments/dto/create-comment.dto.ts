@@ -11,5 +11,5 @@ export class CreateCommentDto {
 
     @IsNumber()
     @IsOptional()
-    replierId?: number;
+    repCommentId?: number;
 }

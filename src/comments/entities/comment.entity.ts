@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { ClaimRequest } from 'src/claim-request/entities/claim-request.entity';
 
@@ -22,6 +22,13 @@ export class Comment {
     @ManyToOne(() => User, (replier) => replier.comments)
     @JoinColumn()
     replier: User;
+
+    @ManyToOne(() => Comment, (comment) => comment.replies)
+    @JoinColumn({ name: 'repCommentId' })
+    repComment: Comment;
+
+    @OneToMany(() => Comment, (comment) => comment.repComment)
+    replies: Comment[];
 
     @CreateDateColumn()
     createdAt: Date;
