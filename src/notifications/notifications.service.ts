@@ -34,7 +34,7 @@ export class NotificationsService {
             html: `<p>${message}</p>`,
         });
 
-        return notification;
+        return new HttpException('Notification sent successfully', 200);
     }
 
     async getNotifications(userId): Promise<Notification[]> {
