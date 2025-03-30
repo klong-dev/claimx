@@ -6,7 +6,7 @@ export class Notification {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => User, (user) => user.notifications, { eager: true })
+    @ManyToOne(() => User, (user) => user.notifications)
     user: User;
 
     @Column()
