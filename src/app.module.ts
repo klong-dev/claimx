@@ -13,6 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ClaimModule } from './claim/claim.module';
 import { CommentsModule } from './comments/comments.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { CommentsModule } from './comments/comments.module';
         signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
       }),
     }),
-    DatabaseModule, UsersModule, DepartmentsModule, ProjectsModule, UserProjectModule, ClaimRequestModule, ClaimModule, CommentsModule],
+    DatabaseModule, UsersModule, DepartmentsModule, ProjectsModule, UserProjectModule, ClaimRequestModule, ClaimModule, CommentsModule, NotificationsModule],
   controllers: [AppController],
   providers: [AppService]
 })

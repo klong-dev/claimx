@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Up
 import { UserProject } from 'src/user-project/entities/user-project.entity';
 import { ClaimRequest } from 'src/claim-request/entities/claim-request.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { Notification } from 'src/notifications/entities/notifications.entity';
 
 
 @Entity()
@@ -35,6 +36,9 @@ export class User {
 
     @OneToMany(() => ClaimRequest, (claimRequest) => claimRequest.claimer)
     claims: ClaimRequest[];
+
+    @OneToMany(() => Notification, (notify) => notify.user)
+    notifications: Notification[];
 
     @OneToMany(() => Comment, (comment) => comment.author)
     comments: Comment[];
