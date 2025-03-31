@@ -75,10 +75,14 @@ export class CommentsService {
   findOne(userId: number, requestId: number) {
     const comments = this.commentRepository.find({
       where: { claimRequest: { id: requestId } },
-      relations: ['author', 'replier'],
+      relations: ['author', 'replier', 'repComment'],
       select: {
         id: true,
         content: true,
+        repComment: {
+          id: true,
+          content: true,
+        },
         author: {
           id: true,
           name: true,
