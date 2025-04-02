@@ -138,6 +138,7 @@ export class ClaimRequestService {
         claimer: { id: userId }, // Gán claimer bằng object { id: userId }
         project: { id: projectId }, // Gán projectId vào object Project
         hours,
+        additionalRemark: updateClaimRequestDto.additionalRemark,
         status: ClaimRequestStatus.DRAFT,
       });
       await this.claimRequestRepo.save(claimRequest);
@@ -289,7 +290,22 @@ export class ClaimRequestService {
               email: true,
               phone: true,
               bankInfo: true,
-            }
+            },
+            project: {
+              id: true,
+              name: true,
+              startDate: true,
+              endDate: true,
+              userProjects: {
+                role: true,
+                user: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  bankInfo: true,
+                }
+              }
+            },
           }
         });
       case 2:
@@ -334,7 +350,10 @@ export class ClaimRequestService {
               bankInfo: true,
             },
             project: {
+              id: true,
               name: true,
+              startDate: true,
+              endDate: true,
               userProjects: {
                 role: true,
                 user: {
@@ -344,7 +363,7 @@ export class ClaimRequestService {
                   bankInfo: true,
                 }
               }
-            }
+            },
           }
         });
         claimRequest.forEach((request) => {
@@ -393,7 +412,22 @@ export class ClaimRequestService {
               email: true,
               phone: true,
               bankInfo: true,
-            }
+            },
+            project: {
+              id: true,
+              name: true,
+              startDate: true,
+              endDate: true,
+              userProjects: {
+                role: true,
+                user: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  bankInfo: true,
+                }
+              }
+            },
           }
         });
     }
