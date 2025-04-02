@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { ClaimRequest } from './entities/claim-request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, Not, Repository } from 'typeorm';
+import { ILike, In, LessThan, MoreThan, Not, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { ClaimRequestStatus } from 'src/enums/claimRequest.enum';
 import { Claim } from 'src/claim/entities/claim.entity';
@@ -79,7 +79,19 @@ export class ClaimRequestService {
   async create(userId: number, createClaimRequestDto: CreateClaimRequestDto) {
     const { claims, projectId, hours } = createClaimRequestDto;
 
-    // Chuyển đổi claims từ DTO sang entity Claim[]
+    // Kiểm tra các claims có trùng thời gian với các claims của các request pending khác không
+    const existingClaims = await this.claimRepo.find({
+      where: claims.map((claim) => ({
+        date: new Date(claim.date), // Chuyển đổi từ string -> Date
+        request: { status: ClaimRequestStatus.PENDING },
+        from: LessThan(claim.to),
+        to: MoreThan(claim.from),
+      })),
+      relations: ['request'],
+    });
+    if (existingClaims.length > 0) {
+      throw new HttpException('Claim time conflict with existing requests', HttpStatus.BAD_REQUEST);
+    }
 
 
     // Tạo claimRequest entity
@@ -126,6 +138,19 @@ export class ClaimRequestService {
 
   async save(userId: number, updateClaimRequestDto: UpdateClaimRequestDto) {
     const { requestId, claims, projectId, hours } = updateClaimRequestDto;
+
+    const existingClaims = await this.claimRepo.find({
+      where: claims.map((claim) => ({
+        date: new Date(claim.date), // Chuyển đổi từ string -> Date
+        request: { status: ClaimRequestStatus.PENDING },
+        from: LessThan(claim.to),
+        to: MoreThan(claim.from),
+      })),
+      relations: ['request'],
+    });
+    if (existingClaims.length > 0) {
+      throw new HttpException('Claim time conflict with existing requests', HttpStatus.BAD_REQUEST);
+    }
 
     const existingClaimRequest = await this.claimRequestRepo.findOne({
       where: { id: requestId },
