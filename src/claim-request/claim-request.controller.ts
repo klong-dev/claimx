@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, Req, Query, ValidationPipe } from '@nestjs/common';
 import { ClaimRequestService } from './claim-request.service';
 import { CreateClaimRequestDto } from './dto/create-claim-request.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -11,7 +11,7 @@ export class ClaimRequestController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Req() req, @Body() dto: CreateClaimRequestDto) {
+  async create(@Req() req, @Body(new ValidationPipe()) dto: CreateClaimRequestDto) {
     const userId = req.user.id;
     return this.claimRequestService.create(userId, dto);
   }
