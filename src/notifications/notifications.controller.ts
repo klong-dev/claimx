@@ -19,4 +19,18 @@ export class NotificationsController {
         const userId = req.user.id;
         return this.notificationsService.getNotifications(userId);
     }
+
+    @Post('mark-as-read')
+    @UseGuards(JwtAuthGuard)
+    async markAsRead(@Req() req, @Body() body: { notificationId: number }) {
+        const userId = req.user.id;
+        return this.notificationsService.markAsRead(userId, body.notificationId);
+    }
+
+    @Post('mark-all-as-read')
+    @UseGuards(JwtAuthGuard)
+    async markAllAsRead(@Req() req) {
+        const userId = req.user.id;
+        return this.notificationsService.markAllAsRead(userId);
+    }
 }

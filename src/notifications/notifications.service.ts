@@ -17,6 +17,33 @@ export class NotificationsService {
         private readonly userRepo: Repository<User>,
     ) { }
 
+    async markAsRead(userId, notificationId: number) {
+        const user = await this.userRepo.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new HttpException('User not found', 404);
+        }
+        const notification = await this.notificationRepo.findOne({ where: { id: notificationId } });
+        if (!notification) {
+            throw new HttpException('Notification not found', 404);
+        }
+        notification.status = 'read';
+        await this.notificationRepo.save(notification);
+        return new HttpException('Notification marked as read', 200);
+    }
+
+    async markAllAsRead(userId) {
+        const user = await this.userRepo.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new HttpException('User not found', 404);
+        }
+        const notifications = await this.notificationRepo.find({ where: { user } });
+        for (const notification of notifications) {
+            notification.status = 'read';
+            await this.notificationRepo.save(notification);
+        }
+        return new HttpException('All notifications marked as read', 200);
+    }
+
     async createNotification(userId, email: string, message: string) {
         const user = await this.userRepo.findOne({ where: { id: userId } });
         if (!user) {

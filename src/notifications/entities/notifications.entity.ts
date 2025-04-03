@@ -15,6 +15,9 @@ export class Notification {
     @Column()
     message: string;
 
+    @Column({ enum: ['unread', 'read'], default: 'unread' })
+    status: 'unread' | 'read';
+
     @CreateDateColumn()
     createdAt: Date;
 }
