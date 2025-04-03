@@ -23,7 +23,19 @@ export class ClaimRequestService {
   async search(userId: number, search: string) {
     const requests = await this.claimRequestRepo.find({
       where: [
-        { claimer: { name: ILike(`%${search}%`) } },
+        {
+          claimer: {
+            name: ILike(`%${search}%`),
+            role: 0,
+            id: userId
+          }
+        },
+        {
+          claimer: {
+            name: ILike(`%${search}%`),
+            role: Not(0)
+          }
+        },
         { project: { name: ILike(`%${search}%`) } },
         { id: Number(search) || undefined },
       ],
