@@ -21,6 +21,10 @@ export class ClaimRequestService {
     private userRepo: Repository<User>) { }
 
   async search(userId: number, search: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
     const requests = await this.claimRequestRepo.find({
       where: [
         {
