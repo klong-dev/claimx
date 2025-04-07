@@ -33,7 +33,7 @@ export class ProjectsService {
     if (!project) {
       throw new Error('Project not found');
     }
-    return await this.projectRepo.remove(project);
+    return await this.projectRepo.update({ id: idProject }, { status: 0 });
   }
 
   async findByUser(userId: number) {
