@@ -45,6 +45,25 @@ export class UsersService {
     return new HttpException('User banned', HttpStatus.OK);
   }
 
+  async unbanUser(userId: number, unbanUserId: number) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    if (user.role != 3) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const unbanUser = await this.usersRepository.findOne({ where: { id: unbanUserId } });
+    if (!unbanUser) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    if (unbanUser.status == 1) {
+      throw new HttpException('User already unbanned', HttpStatus.BAD_REQUEST);
+    }
+    await this.usersRepository.update(unbanUserId, { status: 1 });
+    return new HttpException('User unbanned', HttpStatus.OK);
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
