@@ -31,7 +31,7 @@ export class UsersService {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    if (user.role == 3) {
+    if (user.role != 3) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     const banUser = await this.usersRepository.findOne({ where: { id: banUserId } });
