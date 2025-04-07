@@ -32,6 +32,13 @@ export class UsersController {
     return this.usersService.banUser(userId, +id);
   }
 
+  @Post('unban/:id')
+  @UseGuards(JwtAuthGuard)
+  unbanUser(@Param('id') id: string, @Req() req) {
+    const userId = req.user.id;
+    return this.usersService.unbanUser(userId, +id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
