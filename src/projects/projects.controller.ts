@@ -45,8 +45,8 @@ export class ProjectsController {
 
   @Delete()
   @UseGuards(JwtAuthGuard)
-  removeProject(@Req() req, @Body() userProjectDto) {
+  removeProject(@Req() req, @Body() idProject: number) {
     const userId = req.user.id;
-    return this.projectsService.removeProject(userId, userProjectDto);
+    return this.projectsService.removeProject(userId, idProject);
   }
 }
