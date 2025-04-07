@@ -21,6 +21,21 @@ export class ProjectsService {
     private userRepo: Repository<User>,
   ) { }
 
+  async removeProject(userId: number, idProject: number) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role !== 3) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const project = await this.projectRepo.findOne({ where: { id: idProject } });
+    if (!project) {
+      throw new Error('Project not found');
+    }
+    return await this.projectRepo.remove(project);
+  }
+
   async findByUser(userId: number) {
     const user = await this.userRepo.findOne({ where: { id: userId } });
     if (!user) {
