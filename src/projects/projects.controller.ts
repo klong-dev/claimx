@@ -43,7 +43,7 @@ export class ProjectsController {
     return this.projectsService.create(userId, createProjectDto);
   }
 
-  @Post(':idProject')
+  @Post('delete/:idProject')
   @UseGuards(JwtAuthGuard)
   removeProject(@Req() req, @Param('idProject') idProject: number) {
     const userId = req.user.id;
