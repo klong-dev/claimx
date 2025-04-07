@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,28 +18,28 @@ export class UsersService {
   async getUser(userId: number) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     if (user.role === 3) {
       return await this.usersRepository.find();
     }
-    throw new Error('Unauthorized');
+    throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
   }
 
   async banUser(userId: number, banUserId: number) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     if (user.role == 3) {
-      throw new Error('Unauthorized');
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     const banUser = await this.usersRepository.findOne({ where: { id: banUserId } });
     if (!banUser) {
-      throw new Error('User not found');
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     if (banUser.status == 0) {
-      throw new Error('User already banned');
+      throw new HttpException('User already banned', HttpStatus.BAD_REQUEST);
     }
     return this.usersRepository.update(userId, { status: 0 });
   }
