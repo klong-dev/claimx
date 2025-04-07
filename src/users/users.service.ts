@@ -41,7 +41,8 @@ export class UsersService {
     if (banUser.status == 0) {
       throw new HttpException('User already banned', HttpStatus.BAD_REQUEST);
     }
-    return this.usersRepository.update(userId, { status: 0 });
+    await this.usersRepository.update(banUserId, { status: 0 });
+    return new HttpException('User banned', HttpStatus.OK);
   }
 
   findOne(id: number) {
