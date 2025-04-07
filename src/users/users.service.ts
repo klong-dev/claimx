@@ -26,6 +26,24 @@ export class UsersService {
     throw new Error('Unauthorized');
   }
 
+  async banUser(userId: number, banUserId: number) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    if (user.role == 3) {
+      throw new Error('Unauthorized');
+    }
+    const banUser = await this.usersRepository.findOne({ where: { id: banUserId } });
+    if (!banUser) {
+      throw new Error('User not found');
+    }
+    if (banUser.status == 0) {
+      throw new Error('User already banned');
+    }
+    return this.usersRepository.update(userId, { status: 0 });
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
