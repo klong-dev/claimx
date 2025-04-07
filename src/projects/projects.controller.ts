@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Req, UseGuards, Body, Delete, Param } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -43,9 +43,9 @@ export class ProjectsController {
     return this.projectsService.create(userId, createProjectDto);
   }
 
-  @Delete()
+  @Post(':idProject')
   @UseGuards(JwtAuthGuard)
-  removeProject(@Req() req, @Body() idProject: number) {
+  removeProject(@Req() req, @Param('idProject') idProject: number) {
     const userId = req.user.id;
     return this.projectsService.removeProject(userId, idProject);
   }
