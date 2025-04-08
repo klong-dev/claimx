@@ -39,7 +39,11 @@ export class NotificationsService {
         if (!user) {
             throw new HttpException('User not found', 404);
         }
-        const notifications = await this.notificationRepo.find({ where: { user } });
+        const notifications = await this.notificationRepo.find({
+            where: {
+                recipientEmail: user.email,
+            }
+        });
         if (notifications.length === 0) {
             throw new HttpException('No notifications found', 404);
         }
