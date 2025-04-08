@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     if (user.status === 0) {
-      throw new HttpException('User is banned', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('User is banned', HttpStatus.FORBIDDEN);
     }
 
     const { password, ...payload } = user;
